@@ -22,7 +22,7 @@ pip install pyxt
 ```
 
 ## Usage
-You can retrieve a specific market like so:
+You can retrieve a specific spot market like so:
 ```python
 from pyxt.spot import Spot
 ```
@@ -35,6 +35,21 @@ xt = Spot(host="http://sapi.xt.com", access_key='', secret_key='')
 Information can be sent to, or retrieved from, the XT.COM APIs:
 ```python
 print(xt.balance("usdt"))
+```
+
+You can retrieve a specific future market like so:
+```python
+from pyxt.future import Future
+```
+
+Create an HTTP session and connect via WebSocket for Inverse on mainnet:
+```python
+xt = Future(url="https://fapi.xt.com", access_key='', secret_key='')
+```
+
+Information can be sent to, or retrieved from, the XT.COM APIs:
+```python
+print(xt.get_account_capital())
 ```
 
 ## Contact
