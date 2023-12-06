@@ -8,7 +8,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name='pyxt',
-    version='0.1.1',
+    version='0.2.1',
     description='Python3 XT.COM HTTP API Connector',
     long_description=long_description,
     long_description_content_type="text/markdown",
