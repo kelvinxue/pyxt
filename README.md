@@ -44,7 +44,7 @@ from pyxt.future import Future
 
 Create an HTTP session and connect via WebSocket for Inverse on mainnet:
 ```python
-xt = Future(url="https://fapi.xt.com", access_key='', secret_key='')
+xt = Future(host="https://fapi.xt.com", access_key='', secret_key='')
 ```
 
 Information can be sent to, or retrieved from, the XT.COM APIs:

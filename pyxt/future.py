@@ -142,8 +142,8 @@ def api_key_post(path, url, access_key, secret_key, bodymod, params):
 
 
 class Future:
-    def __init__(self, url, access_key, secret_key):
-        self.__url = url
+    def __init__(self, host, access_key, secret_key):
+        self.__url = host
         self.__access_key = access_key
         self.__secret_key = secret_key
 
