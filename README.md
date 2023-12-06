@@ -29,7 +29,7 @@ from pyxt.spot import Spot
 
 Create an HTTP session and connect via WebSocket for Inverse on mainnet:
 ```python
-xt = Spot(host="http://sapi.xt.com", access_key='', secret_key='')
+xt = Spot(host="https://sapi.xt.com", access_key='', secret_key='')
 ```
 
 Information can be sent to, or retrieved from, the XT.COM APIs:
