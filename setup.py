@@ -8,15 +8,15 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name='pyxt',
-    version='0.3.1',
+    version='0.3.2',
     description='Python3 XT.COM HTTP API Connector',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/kelvinxue/pyxt",
-    download_url='https://github.com/kelvinxue/pyxt/archive/refs/tags/v0.3.1.tar.gz',
+    download_url='https://github.com/kelvinxue/pyxt/archive/refs/tags/v0.3.2.tar.gz',
     license="MIT License",
-    author="kx",
-    author_email="kx@xt.com",
+    author="xt",
+    author_email="xt@xt.com",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
