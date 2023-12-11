@@ -3,10 +3,8 @@
 import time
 import json
 import threading
-import hashlib
-import hmac
 
-import logger
+import logging
 from typing import Optional
 from urllib.parse import urlparse
 from websocket import (
@@ -17,6 +15,8 @@ from websocket import (
     WebSocketTimeoutException,
 )
 
+
+logger = logging.getLogger(__name__)
 
 def get_timestamp():
     return int(time.time() * 1000)
