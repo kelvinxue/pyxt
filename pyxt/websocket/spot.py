@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from typing import Optional
-from xt_websocket import XTWebsocketClient
+from pyxt.websocket.xt_websocket import XTWebsocketClient
 
 
 class SpotWebsocketStreamClient(XTWebsocketClient):
