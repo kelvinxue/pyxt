@@ -8,12 +8,12 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name='pyxt',
-    version='0.4.2',
+    version='0.4.3',
     description='Python3 XT.COM HTTP API Connector',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/kelvinxue/pyxt",
-    download_url='https://github.com/kelvinxue/pyxt/archive/refs/tags/v0.4.2.tar.gz',
+    download_url='https://github.com/kelvinxue/pyxt/archive/refs/tags/v0.4.3.tar.gz',
     license="MIT License",
     author="xt",
     author_email="xt@xt.com",
@@ -26,7 +26,7 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
     keywords="xt api connector",
-    packages=["pyxt"],
+    packages=["pyxt", "pyxt.websocket"],
     python_requires=">=3.9",
     install_requires=[
         "requests"
