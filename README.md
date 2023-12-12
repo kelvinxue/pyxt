@@ -10,6 +10,7 @@ Official Python3 API connector for XT.COM's HTTP APIs.
 - [About](#about)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Examples](#examples)
 - [Contact](#contact)
 
 ## About
@@ -39,18 +40,21 @@ print(xt.balance("usdt"))
 
 You can retrieve a specific future market like so:
 ```python
-from pyxt.future import Future
+from pyxt.perp import Perp
 ```
 
 Create an HTTP session and connect via WebSocket for Inverse on mainnet:
 ```python
-xt = Future(host="https://fapi.xt.com", access_key='', secret_key='')
+xt = Perp(host="https://fapi.xt.com", access_key='', secret_key='')
 ```
 
 Information can be sent to, or retrieved from, the XT.COM APIs:
 ```python
 print(xt.get_account_capital())
 ```
+
+## Examples
+You can find more examples in the project folder /examples/
 
 ## Contact
 You can reach out for support on the [XTAPI Telegram](https://t.me/XT_api) group chat.
