@@ -15,8 +15,8 @@ from websocket import (
     WebSocketTimeoutException,
 )
 
-
 logger = logging.getLogger(__name__)
+
 
 def get_timestamp():
     return int(time.time() * 1000)
@@ -213,13 +213,13 @@ class XTWebsocketClient:
     def send(self, message: dict):
         self.socket_manager.send_message(json.dumps(message))
 
-    def send_message_to_server(self, message, action=None, id=None):
+    def send_message_to_server(self, message, action=None, id=None, listen_key=None):
         if not id:
             id = get_timestamp()
 
         if action != self.ACTION_UNSUBSCRIBE:
-            return self.subscribe(message, id=id)
-        return self.unsubscribe(message, id=id)
+            return self.subscribe(message, id=id, listen_key=listen_key)
+        return self.unsubscribe(message, id=id, listen_key=listen_key)
 
     def subscribe(self, stream, id=None, listen_key=None):
         if not id:

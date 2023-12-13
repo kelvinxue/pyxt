@@ -130,3 +130,38 @@ class PerpWebsocketStreamClient(XTWebsocketClient):
         """
         stream_name = "fund_rate@{}".format(symbol.lower())
         self.send_message_to_server(stream_name, action=action, id=id)
+
+    def user_balance(self, listen_key, id=None, action=None):
+        """
+        :return: balance
+        """
+        stream_name = "balance@{}".format(listen_key)
+        self.send_message_to_server(stream_name, action=action, id=id)
+
+    def user_position(self, listen_key, id=None, action=None):
+        """
+        :return: position
+        """
+        stream_name = "position@{}".format(listen_key)
+        self.send_message_to_server(stream_name, action=action, id=id)
+
+    def user_trade(self, listen_key, id=None, action=None):
+        """
+        :return: trade
+        """
+        stream_name = "trade@{}".format(listen_key)
+        self.send_message_to_server(stream_name, action=action, id=id)
+
+    def user_order(self, listen_key, id=None, action=None):
+        """
+        :return: order
+        """
+        stream_name = "order@{}".format(listen_key)
+        self.send_message_to_server(stream_name, action=action, id=id)
+
+    def user_notify(self, listen_key, id=None, action=None):
+        """
+        :return: notify
+        """
+        stream_name = "notify@{}".format(listen_key)
+        self.send_message_to_server(stream_name, action=action, id=id)

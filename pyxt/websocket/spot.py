@@ -94,3 +94,27 @@ class SpotWebsocketStreamClient(XTWebsocketClient):
 
         stream_name = "tickers"
         self.send_message_to_server(stream_name, action=action, id=id)
+
+    def user_balance(self, listen_key, id=None, action=None):
+        """
+        Stream Name: balance
+        """
+
+        stream_name = "balance"
+        self.send_message_to_server(stream_name, action=action, id=id, listen_key=listen_key)
+
+    def user_order(self, listen_key, id=None, action=None):
+        """
+        Stream Name: order
+        """
+
+        stream_name = "order"
+        self.send_message_to_server(stream_name, action=action, id=id, listen_key=listen_key)
+
+    def user_trade(self, listen_key, id=None, action=None):
+        """
+        Stream Name: trade
+        """
+
+        stream_name = "trade"
+        self.send_message_to_server(stream_name, action=action, id=id, listen_key=listen_key)
