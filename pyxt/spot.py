@@ -579,8 +579,7 @@ class Spot:
         """
         @return:
         """
-        params = {}
-        res = self.req_post('/v4/ws-token', params, auth=True)
+        res = self.req_post('/v4/ws-token', auth=True)
         return res['result']
 
 
@@ -704,5 +703,6 @@ class XtBusinessError(Exception):
 
 
 if __name__ == "__main__":
-    xt = Spot(host="http://sapi.xt.com", access_key='', secret_key='')
-    print(xt.balance("usdt"))
+    xt = Spot(host="http://sapi.xt.com", access_key='',
+              secret_key='')
+    print(xt.listen_key())
