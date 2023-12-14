@@ -7,7 +7,6 @@ import logging
 from copy import deepcopy
 from typing import List, Dict
 
-
 logger = logging.getLogger('xt4')
 
 """
@@ -90,7 +89,7 @@ class Spot:
         except Exception as e:
             info = f'url:{url} method:{method} params:{params} exception:{e}'
             logger.error(info, exc_info=True)
-            raise XtHttpError(e, info=info, request={'url':url, 'method':method, 'params': params},
+            raise XtHttpError(e, info=info, request={'url': url, 'method': method, 'params': params},
                               response=resp, res=res)
         if res['rc'] != 0:
             if res['mc'] == 'AUTH_103':  # 签名错误时，在日志中提供出ak，url, headers, 以便校验。
@@ -192,7 +191,7 @@ class Spot:
         res = self.req_get('/v4/public/depth', params)
         return res['result']
 
-    def get_kline(self, symbol: str, interval: str, start_time:int =None, end_time:int=None, limit:int=100):
+    def get_kline(self, symbol: str, interval: str, start_time: int = None, end_time: int = None, limit: int = 100):
         """
             获取k线数据
         :param symbol:
@@ -222,7 +221,7 @@ class Spot:
         res = self.req_get('/v4/public/kline', params)
         return res['result']
 
-    def get_trade_recent(self, symbol, limit:int=None):
+    def get_trade_recent(self, symbol, limit: int = None):
         """
             查询近期成交列表
         :param symbol:
@@ -244,7 +243,7 @@ class Spot:
         res = self.req_get('/v4/public/trade/recent', params)
         return res['result']
 
-    def get_trade_history(self, symbol, limit:int = None, from_id:int = None):
+    def get_trade_history(self, symbol, limit: int = None, from_id: int = None):
         """
             查询历史成交列表
         :param symbol:
@@ -269,7 +268,7 @@ class Spot:
         res = self.req_get('/v4/public/trade/history', params)
         return res['result']
 
-    def get_tickers(self, symbol: str=None, symbols:list=None) -> dict:
+    def get_tickers(self, symbol: str = None, symbols: list = None) -> dict:
         """
 
         :param symbol:
@@ -293,7 +292,7 @@ class Spot:
         res = self.req_get('/v4/public/ticker/price', params)
         return res['result']
 
-    def get_tickers_book(self, symbol:str = None, symbols: list=None):
+    def get_tickers_book(self, symbol: str = None, symbols: list = None):
         """
             获取最优挂单ticker
         :param symbol:
@@ -316,7 +315,7 @@ class Spot:
         res = self.req_get('/v4/public/ticker/book', params)
         return res['result']
 
-    def get_tickers_24h(self, symbol:str = None, symbols: list=None):
+    def get_tickers_24h(self, symbol: str = None, symbols: list = None):
         """
             获取24h统计ticker
         :param symbol:
@@ -467,7 +466,7 @@ class Spot:
         items = []
         for item in data:
             # item_ = {transfer_hump(k): v for k, v in item.items()}
-            items.append(item_)
+            items.append(item)
         params = {"clientBatchId": batch_id, "items": items}
         res = self.req_post("/v4/batch-order", params)
         return res['result']
@@ -497,7 +496,8 @@ class Spot:
             now_order_ids = order_ids_all[page_size * page: (page + 1) * page_size]
         return res
 
-    def get_history_orders(self, symbol=None, biz_type=None, side=None, type=None, order_id=None, from_id=None, direction=None,
+    def get_history_orders(self, symbol=None, biz_type=None, side=None, type=None, order_id=None, from_id=None,
+                           direction=None,
                            limit=None, start_time=None, end_time=None, hidden_canceled=None):
         """
             历史订单查询
@@ -542,7 +542,7 @@ class Spot:
 
         """
         vars = locals()
-        params = {k:v for k, v in vars.items() if k != 'self' and v is not None}
+        params = {k: v for k, v in vars.items() if k != 'self' and v is not None}
         res = self.req_get('/v4/trade', params)
         return res['result']
 
@@ -575,6 +575,15 @@ class Spot:
         res = self.req_get('/v4/balances', params)
         return res['result']
 
+    def listen_key(self):
+        """
+        @return:
+        """
+        params = {}
+        res = self.req_post('/v4/ws-token', params, auth=True)
+        return res['result']
+
+
 import json
 import requests
 
@@ -589,6 +598,7 @@ class XtHttpError(Exception):
         'response': '响应',
         'res': '结果',
     }
+
     def __init__(self, *args, **kwargs):
         """
 
@@ -679,7 +689,7 @@ XT_MES_ERRORS = {
 
 
 class XtBusinessError(Exception):
-    def __init__(self, data, info: str=None):
+    def __init__(self, data, info: str = None):
         self.return_code = data.get('rc', '0')
         self.message_code = data.get('mc', '0')
         self.source = data
