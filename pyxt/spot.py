@@ -582,6 +582,34 @@ class Spot:
         res = self.req_post('/v4/ws-token', auth=True)
         return res['result']
 
+    def transfer(self, from_account, to_account, currency, amount):
+        """
+        BizType
+        Status	Description
+        SPOT	现货
+        LEVER	杠杠
+        FINANCE	理财
+        FUTURES_U	合约u本位
+        FUTURES_C	合约币本位
+
+        @param from_account: BizType
+        @param to_account: BizType
+        @param currency:币种名称必须全部小写（usdt，btc）
+        @param amount:
+        @return:
+        """
+
+        params = {
+            "bizId": int(time.time() * 1000),
+            "from": from_account,
+            "to": to_account,
+            "currency": currency,
+            "amount": amount
+        }
+
+        res = self.req_post("/v4/order", params, auth=True)
+        return res['result']
+
 
 import json
 import requests
