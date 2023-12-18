@@ -409,7 +409,7 @@ class Perp:
         }
         header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, body=params, timeout=self.timeout)
         return code, success, error
 
 
