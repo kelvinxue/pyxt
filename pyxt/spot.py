@@ -384,7 +384,7 @@ class Spot:
             params['quoteQty'] = quote_qty
         if quantity:
             if type == "MARKET" and side == "BUY" and quote_qty is None:
-                params['quote_qty'] = quantity * price
+                params['quoteQty'] = quantity * price
             else:
                 params['quantity'] = quantity
         res = self.req_post("/v4/order", params)
