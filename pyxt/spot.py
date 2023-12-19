@@ -610,7 +610,7 @@ class Spot:
             "amount": amount
         }
 
-        res = self.req_post("/v4/order", params, auth=True)
+        res = self.req_post("/v4/balance/transfer", params, auth=True)
         return res['result']
 
 
