@@ -229,7 +229,7 @@ class Perp:
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
 
-    def send_order(self, symbol, price, amount, order_side, order_type, position_side):
+    def send_order(self, symbol, amount, order_side, order_type, position_side, price=None):
         """
         :return: send order
         """
@@ -237,8 +237,10 @@ class Perp:
                   "orderType": order_type,
                   "origQty": amount,
                   "positionSide": position_side,
-                  "symbol": symbol,
-                  "price": price}
+                  "symbol": symbol
+                  }
+        if price:
+            params["price"] = price
 
         bodymod = "application/x-www-form-urlencoded"
         path = "/future/trade" + '/v1/order/create'
@@ -246,7 +248,7 @@ class Perp:
 
         header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, body=params, timeout=self.timeout)
         return code, success, error
 
     def get_account_order(self, symbol, state, page, size):
@@ -415,7 +417,12 @@ class Perp:
 
 
 if __name__ == '__main__':
+    symbol_xt = 'btc_usdt'
+    quantity = 5
     host = "https://fapi.xt.com"
     access_key = ""
     secret_key = ""
     xt_perp = Perp(host, access_key, secret_key)
+    result = xt_perp.send_order(symbol=symbol_xt, amount=quantity, order_side='BUY', order_type='MARKET',
+                                position_side='LONG')
+    print(result)
