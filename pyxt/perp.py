@@ -142,6 +142,7 @@ class Perp:
         url = self.host + "/future/market" + '/v1/public/q/agg-ticker'
         code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
         return code, success, error
+
     def get_book_ticker(self, symbol):
         """
         :return:book ticker

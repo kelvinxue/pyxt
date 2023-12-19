@@ -380,10 +380,13 @@ class Spot:
             params['clientOrderId'] = client_order_id
         if price:
             params['price'] = price
-        if quantity:
-            params['quantity'] = quantity
         if quote_qty:
             params['quoteQty'] = quote_qty
+        if quantity:
+            if type == "MARKET" and side == "BUY" and quote_qty is None:
+                params['quote_qty'] = quantity * price
+            else:
+                params['quantity'] = quantity
         res = self.req_post("/v4/order", params)
         return res['result']
 
