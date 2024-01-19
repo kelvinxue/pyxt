@@ -11,41 +11,41 @@ class Perp:
         self.host = host
         self.__access_key = access_key
         self.__secret_key = secret_key
-        self.timeout = kwargs["timeout"] if kwargs.get("timeout", None) else 5
+        self.timeout = kwargs["timeout"] if kwargs.get("timeout", None) else 10
 
     @staticmethod
-    def _create_sign(access_key, secret_key, path: str, method: str, bodymod: str = None, params: dict = None):
+    def _create_sign(access_key, secret_key, path: str, bodymod: str = None, params: dict = None):
+        header = dict()
         apikey = access_key
         secret = secret_key
         timestamp = str(int(time.time() * 1000))
-        if bodymod == 'x-www-form-urlencoded' or bodymod is {} or params is not {}:
-            params = dict(sorted(params.items(), key=lambda e: e[0]))
-            message = "&".join([f"{arg}={params[arg]}" for arg in params])
-        elif bodymod == 'json':
-            params = params
-            message = "&".join([f"{arg}={params[arg]}" for arg in params])
+        if bodymod == 'application/x-www-form-urlencoded':
+            if params:
+                params = dict(sorted(params.items(), key=lambda e: e[0]))
+                message = "&".join([f"{arg}={params[arg]}" for arg in params])
+                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}'
+            else:
+                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}'
+            print(signkey)
+        elif bodymod == 'application/json':
+            if params:
+                message = json.dumps(params)
+                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}'
+            else:
+                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}'
+            print(signkey)
         else:
             assert False, f"not support this bodymod:{bodymod}"
 
-        if method == 'get' and len(params.keys()) > 0:
-            signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}'
-        elif method == 'get' and len(params.keys()) == 0:
-            signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}'
-        elif method == 'post' and len(params.keys()) > 0:
-            signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}'
-        elif method == 'post' and len(params.keys()) == 0:
-            signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}'
-        else:
-            assert False, f"not support this request method:{method}"
-
         digestmodule = hashlib.sha256
         sign = hmac.new(secret.encode("utf-8"), signkey.encode("utf-8"), digestmod=digestmodule).hexdigest()
-        header = {
+        header.update({
+            'validate-signversion': "2",
             'xt-validate-appkey': apikey,
             'xt-validate-timestamp': timestamp,
             'xt-validate-signature': sign,
-            'xt-validate-algorithms': "HmacSHA256",
-        }
+            'xt-validate-algorithms': "HmacSHA256"
+        })
         return header
 
     @staticmethod
@@ -104,6 +104,8 @@ class Perp:
             print("response data is not json format!")
             print("method:", method, "url:", url, "headers:", headers, "params:", params, "body:", body,
                   "data:", data, "code:", code, "result:", json.dumps(result))
+        print("method:", method, "url:", url, "headers:", headers, "params:", params, "body:", body,
+              "data:", data, "code:", code)
         return code, result, None
 
     def get_market_config(self, symbol):
@@ -207,87 +209,63 @@ class Perp:
         """
         :return: account capital
         """
-        bodymod = "application/x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/user" + '/v1/balance/list'
         url = self.host + path
         params = {}
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="get", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="GET", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
     def get_listen_key(self):
         """
         :return: listen_key
         """
-        bodymod = "application/x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/user" + '/v1/user/listen-key'
         url = self.host + path
         params = {}
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="get", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="GET", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
     def send_order(self, symbol, amount, order_side, order_type, position_side, price=None):
         """
         :return: send order
         """
-        params = {"orderSide": order_side,
-                  "orderType": order_type,
-                  "origQty": amount,
-                  "positionSide": position_side,
-                  "symbol": symbol
-                  }
+        params = {
+            "orderSide": order_side,
+            "orderType": order_type,
+            "origQty": amount,
+            "positionSide": position_side,
+            "symbol": symbol
+        }
         if price:
             params["price"] = price
 
-        bodymod = "application/x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/trade" + '/v1/order/create'
         url = self.host + path
-
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
+        params = dict(sorted(params.items(), key=lambda e: e[0]))
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, body=params, timeout=self.timeout)
-        return code, success, error
-
-    def get_account_order(self, symbol, state, page, size):
-        """
-        state:
-        NEW
-        PARTIALLY_FILLED
-        FILLED
-        CANCELED
-        REJECTED
-        UNFINISHED
-        """
-        bodymod = "application/x-www-form-urlencoded"
-        path = "/future/trade" + '/v1/order-entrust/list'
-        url = self.host + path
-        params = {
-            "symbol": symbol,
-            "state": state,
-            "page": page,
-            "size": size
-        }
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="get", bodymod=bodymod,
-                                   params=params)
-        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
     def send_batch_order(self, order_list):
         """
         :return: send batch order
         """
-        params = {"list": str(order_list)}
+        params = {"list": json.dumps(order_list)}
 
-        bodymod = "x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/trade" + '/v1/order/create-batch'
         url = self.host + path
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-
-        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
     def get_history_order(self):
@@ -299,7 +277,7 @@ class Perp:
         path = "/future/trade" + '/v1/order/list-history'
         url = self.host + path
         params = {}
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="get", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
@@ -315,7 +293,7 @@ class Perp:
         params = {
             "symbol": symbol,
         }
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="get", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
@@ -325,15 +303,15 @@ class Perp:
         cancel_order
         :return:
         """
-        bodymod = "application/x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/trade" + '/v1/order/cancel'
         url = self.host + path
         params = {
             "orderId": order_id
         }
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
     def cancel_batch_order(self, order_id_list: list):
@@ -342,28 +320,30 @@ class Perp:
         :return:
         {'returnCode': 0, 'msgInfo': 'success', 'error': None, 'result': True}
         """
-        bodymod = "application/x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/trade" + '/v1/order/cancel-batch'
         url = self.host + path
         params = {
             "orderIds": str(order_id_list)
         }
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
-    def cancel_all_order(self):
+    def cancel_all_order(self, symbol):
         """
         :return: cancel_all_order
         """
-        bodymod = "application/x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/trade" + '/v1/order/cancel-all'
         url = self.host + path
-        params = {}
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
+        params = {
+            "symbol": symbol
+        }
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, params=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
     def get_order_id(self, order_id):
@@ -377,32 +357,16 @@ class Perp:
         params = {
             "orderId": order_id
         }
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="get", bodymod=bodymod,
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
-        return code, success, error
-
-    def get_batch_order_id(self, order_id_list: list):
-        """
-        :return: get_batch_order_id
-        """
-        bodymod = "application/x-www-form-urlencoded"
-        path = "/future/trade" + '/v1/order/list-by-ids'
-        url = self.host + path
-        order_id_query = ",".join(order_id_list)
-        params = {
-            "ids": order_id_query
-        }
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
-                                   params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
 
     def set_account_leverage(self, leverage, position_side, symbol):
         """
         :return: set_account_leverage
         """
-        bodymod = "application/x-www-form-urlencoded"
+        bodymod = "application/json"
         path = "/future/user" + '/v1/position/adjust-leverage'
         url = self.host + path
         params = {
@@ -410,19 +374,72 @@ class Perp:
             "positionSide": position_side,
             "symbol": symbol
         }
-        header = self._create_sign(self.__access_key, self.__secret_key, path=path, method="post", bodymod=bodymod,
+        params = dict(sorted(params.items(), key=lambda e: e[0]))
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
-        code, success, error = self._fetch(method="POST", url=url, headers=header, body=params, timeout=self.timeout)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
+
+    def get_account_order(self, state):
+        """
+        :return: get_account_order
+        """
+        bodymod = "application/x-www-form-urlencoded"
+        path = "/future/trade" + '/v1/order/list'
+        url = self.host + path
+        params = {
+            "state": state,
+        }
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
 
 
 if __name__ == '__main__':
-    symbol_xt = 'btc_usdt'
-    quantity = 5
+    symbol_xt = 'eth_usdt'
+    quantity = 1
     host = "https://fapi.xt.com"
     access_key = ""
     secret_key = ""
     xt_perp = Perp(host, access_key, secret_key)
-    result = xt_perp.send_order(symbol=symbol_xt, amount=quantity, order_side='BUY', order_type='MARKET',
-                                position_side='LONG')
-    print(result)
+    # 1.账户资金
+    # res = xt_perp.get_account_capital()
+    # print(res)
+    # 2.listen-key
+    # res = xt_perp.get_listen_key()
+    # print(res)
+    # 3.下单
+    # res = xt_perp.send_order(symbol=symbol_xt, amount=quantity, order_side='BUY', price=2000, order_type='LIMIT',
+    #                          position_side='LONG')
+    # print(res)
+    # 4.撤单
+    # res = xt_perp.cancel_order(order_id="318210447946495424")
+    # print(res)
+    # 5.批量下单有问题
+    # res = xt_perp.send_batch_order(
+    #     order_list=[
+    #         {"symbol": "eth_usdt", "origQty": "1", "orderSide": "BUY", "price": "2000", "positionSide": "LONG"},
+    #         {"symbol": "eth_usdt", "origQty": "1", "orderSide": "BUY", "price": "2000", "positionSide": "LONG"}])
+    # print(res)
+    # 6.批量撤单有问题
+    # res = xt_perp.cancel_batch_order([""])
+    # print(res)
+    # 7.查询账户订单
+    # res = xt_perp.get_account_order("NEW")
+    # print(res)
+    # 8.查询订单状态 318212657052603520
+    # res = xt_perp.get_order_id("318212657052603520")
+    # print(res)
+    # 10.设置杠杆
+    # res = xt_perp.set_account_leverage(leverage=1,symbol="eth_usdt",position_side="LONG")
+    # print(res)
+    # 11.查询历史订单
+    # res = xt_perp.get_history_order()
+    # print(res)
+    # 12.全部撤单
+    # res = xt_perp.cancel_all_order(symbol="eth_usdt")
+    # print(res)
+    # 13.获取仓位
+    # res = xt_perp.get_position(symbol="eth_usdt")
+    # print(res)
