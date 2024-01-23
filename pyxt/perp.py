@@ -23,17 +23,15 @@ class Perp:
             if params:
                 params = dict(sorted(params.items(), key=lambda e: e[0]))
                 message = "&".join([f"{arg}={params[arg]}" for arg in params])
-                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}'
+                signkey = f"xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}"
             else:
-                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}'
-            print(signkey)
+                signkey = f"xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}"
         elif bodymod == 'application/json':
             if params:
                 message = json.dumps(params)
-                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}'
+                signkey = f"xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}#{message}"
             else:
-                signkey = f'xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}'
-            print(signkey)
+                signkey = f"xt-validate-appkey={apikey}&xt-validate-timestamp={timestamp}#{path}"
         else:
             assert False, f"not support this bodymod:{bodymod}"
 
@@ -94,7 +92,8 @@ class Perp:
         code = response.status_code
         if code not in (200, 201, 202, 203, 204, 205, 206):
             text = response.text
-            print("method:", method, "url:", url, "headers:", headers, "params:", params, "body:", body,
+            request_url = response.request.url
+            print("method:", method, "url:", request_url, "headers:", headers, "params:", params, "body:", body,
                   "data:", data, "code:", code, "result:", text)
             return code, None, text
         try:
@@ -258,13 +257,14 @@ class Perp:
         """
         :return: send batch order
         """
-        params = {"list": json.dumps(order_list)}
+        params = order_list
 
         bodymod = "application/json"
-        path = "/future/trade" + '/v1/order/create-batch'
+        path = "/future/trade" + "/v2/order/create-batch"
         url = self.host + path
         header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
+        header.pop("validate-signversion")
         code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
@@ -295,6 +295,7 @@ class Perp:
         }
         header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
+        header["Content-Type"] = "application/x-www-form-urlencoded"
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
 
@@ -399,7 +400,10 @@ class Perp:
 if __name__ == '__main__':
     symbol_xt = 'eth_usdt'
     quantity = 1
-    host = "https://fapi.xt.com"
+    # host = "http://fapi.xt-qa.com"
+    # access_key = "27d924c4-583b-4138-af36-f1c2ee33d10a"
+    # secret_key = "a28c2e28bea31d1970253d326306c1ae311b42ff"
+    host = "http://fapi.xt.com"
     access_key = ""
     secret_key = ""
     xt_perp = Perp(host, access_key, secret_key)
@@ -414,16 +418,16 @@ if __name__ == '__main__':
     #                          position_side='LONG')
     # print(res)
     # 4.撤单
-    # res = xt_perp.cancel_order(order_id="318210447946495424")
+    # res = xt_perp.cancel_order(order_id="319725440900455488")
     # print(res)
-    # 5.批量下单有问题
+    # 5.批量下单
     # res = xt_perp.send_batch_order(
     #     order_list=[
-    #         {"symbol": "eth_usdt", "origQty": "1", "orderSide": "BUY", "price": "2000", "positionSide": "LONG"},
-    #         {"symbol": "eth_usdt", "origQty": "1", "orderSide": "BUY", "price": "2000", "positionSide": "LONG"}])
+    #         {"symbol": "eth_usdt", "origQty": "1", "orderSide": "BUY", "price": "2000", "positionSide": "LONG",
+    #          "orderType": "LIMIT"}])
     # print(res)
-    # 6.批量撤单有问题
-    # res = xt_perp.cancel_batch_order([""])
+    # 6.批量撤单
+    # res = xt_perp.cancel_batch_order(["319626610863430720"])
     # print(res)
     # 7.查询账户订单
     # res = xt_perp.get_account_order("NEW")
