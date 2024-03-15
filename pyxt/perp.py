@@ -268,7 +268,7 @@ class Perp:
         code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
-    def get_history_order(self):
+    def get_history_order(self, symbol=None, direction=None, oid=None, limit=None, start_time=None, end_time=None):
         """
         :return: get_history_order
         Error
@@ -277,6 +277,19 @@ class Perp:
         path = "/future/trade" + '/v1/order/list-history'
         url = self.host + path
         params = {}
+        if symbol:
+            params["symbol"] = symbol
+        if direction:
+            params["direction"] = direction
+        if oid:
+            params["id"] = oid
+        if limit:
+            params["limit"] = limit
+        if start_time:
+            params["startTime"] = start_time
+        if end_time:
+            params["endTime"] = end_time
+
         header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
@@ -400,10 +413,7 @@ class Perp:
 if __name__ == '__main__':
     symbol_xt = 'eth_usdt'
     quantity = 1
-    # host = "http://fapi.xt-qa.com"
-    # access_key = "27d924c4-583b-4138-af36-f1c2ee33d10a"
-    # secret_key = "a28c2e28bea31d1970253d326306c1ae311b42ff"
-    host = "http://fapi.xt.com"
+    host = "http://fapi.xt-qa.com"
     access_key = ""
     secret_key = ""
     xt_perp = Perp(host, access_key, secret_key)
@@ -439,8 +449,8 @@ if __name__ == '__main__':
     # res = xt_perp.set_account_leverage(leverage=1,symbol="eth_usdt",position_side="LONG")
     # print(res)
     # 11.查询历史订单
-    # res = xt_perp.get_history_order()
-    # print(res)
+    res = xt_perp.get_history_order()
+    print(res)
     # 12.全部撤单
     # res = xt_perp.cancel_all_order(symbol="eth_usdt")
     # print(res)
