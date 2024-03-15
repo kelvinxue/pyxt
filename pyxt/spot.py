@@ -519,7 +519,7 @@ class Spot:
         """
         vars = locals()
         params = {k: v for k, v in vars.items() if k != 'self' and v is not None}
-        res = self.req_get('/v4/history-order')
+        res = self.req_get('/v4/history-order', params)
         return res['result']
 
     def get_trade(self, symbol=None, biz_type=None, side=None, type=None, order_id=None, from_id=None, direction=None,
