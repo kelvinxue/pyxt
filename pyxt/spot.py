@@ -47,6 +47,11 @@ class Spot:
         }
 
     @classmethod
+    def underscore_to_camelcase(cls, name):
+        parts = name.split('_')
+        return parts[0] + ''.join(x.title() for x in parts[1:])
+
+    @classmethod
     def create_sign(cls, url, method, headers=None, secret_key=None, **kwargs):
         path_str = url
         query = kwargs.pop('params', None)
@@ -500,8 +505,7 @@ class Spot:
         return res
 
     def get_history_orders(self, symbol=None, biz_type=None, side=None, type=None, order_id=None, from_id=None,
-                           direction=None,
-                           limit=None, start_time=None, end_time=None, hidden_canceled=None):
+                           direction=None, limit=None, start_time=None, end_time=None, hidden_canceled=None):
         """
             历史订单查询
         :param symbol:
@@ -518,7 +522,8 @@ class Spot:
         :return:
         """
         vars = locals()
-        params = {k: v for k, v in vars.items() if k != 'self' and v is not None}
+        params = {self.underscore_to_camelcase(k): v for k, v in vars.items() if k != 'self' and v is not None}
+
         res = self.req_get('/v4/history-order', params)
         return res['result']
 
@@ -545,7 +550,7 @@ class Spot:
 
         """
         vars = locals()
-        params = {k: v for k, v in vars.items() if k != 'self' and v is not None}
+        params = {self.underscore_to_camelcase(k): v for k, v in vars.items() if k != 'self' and v is not None}
         res = self.req_get('/v4/trade', params)
         return res['result']
 
