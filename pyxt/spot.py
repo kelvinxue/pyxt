@@ -248,10 +248,11 @@ class Spot:
         res = self.req_get('/v4/public/trade/recent', params)
         return res['result']
 
-    def get_trade_history(self, symbol, limit: int = None, from_id: int = None):
+    def get_trade_history(self, symbol, direction, limit: int = None, from_id: int = None):
         """
             查询历史成交列表
         :param symbol:
+        :param direction: query direction
         :param limit: 数量，默认200，取值1到1000
         :param from_id: 起始id,eg 6216559590087220004
         :return:[
@@ -265,7 +266,10 @@ class Spot:
     }
   ]
         """
-        params = {'symbol': symbol}
+        params = {
+            'symbol': symbol,
+            'direction': direction
+        }
         if limit:
             params['limit'] = limit
         if from_id:
@@ -404,15 +408,22 @@ class Spot:
         res = self.req_delete(f'/v4/order/{order_id}')
         return res['result']
 
-    def get_open_orders(self, symbol=None, page=1, page_size=300) -> list:
+    def get_open_orders(self, symbol=None, biz_type=None, side=None) -> list:
         """
             查询当前挂单
-        :param symbol:
-        :param page:
-        :param page_size:
+        :param symbol:Trading pair, if not filled in, represents all
+        :param biz_type:SPOT, LEVER
+        :param side:BUY,SELL
         :return:
         """
-        params = {'symbol': symbol, 'page': page, 'pageSize': page_size, 'bizType': 'SPOT'}
+        params = {}
+        if symbol:
+            params["symbol"] = symbol
+        if biz_type:
+            params["bizType"] = biz_type
+        if side:
+            params["side"] = side
+
         res = self.req_get("/v4/open-order", params)
         return res['result']
 
@@ -736,9 +747,3 @@ class XtBusinessError(Exception):
 
     def __str__(self):
         return f"XT ERROR. RC:{self.return_code} MC: {self.message_code} DESC:{self.desc} INFO: {self.info} SOURCE:{json.dumps(self.source)}"
-
-
-if __name__ == "__main__":
-    xt = Spot(host="http://sapi.xt.com", access_key='',
-              secret_key='')
-    print(xt.listen_key())
