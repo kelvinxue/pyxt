@@ -230,7 +230,9 @@ class Perp:
         code, success, error = self._fetch(method="GET", url=url, headers=header, data=params, timeout=self.timeout)
         return code, success, error
 
-    def send_order(self, symbol, amount, order_side, order_type, position_side, price=None):
+    def send_order(self, symbol, amount, order_side, order_type, position_side, price=None,
+                   client_order_id=None, time_in_force=None, trigger_profit_price=None,
+                   trigger_stop_price=None):
         """
         :return: send order
         """
@@ -243,11 +245,19 @@ class Perp:
         }
         if price:
             params["price"] = price
+        if client_order_id:
+            params["clientOrderId"] = client_order_id
+        if time_in_force:
+            params["timeInForce"] = time_in_force
+        if trigger_profit_price:
+            params["triggerProfitPrice"] = trigger_profit_price
+        if trigger_stop_price:
+            params["triggerStopPrice"] = trigger_stop_price
 
         bodymod = "application/json"
         path = "/future/trade" + '/v1/order/create'
         url = self.host + path
-        params = dict(sorted(params.items(), key=lambda e: e[0]))
+        # params = dict(sorted(params.items(), key=lambda e: e[0]))
         header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
                                    params=params)
         code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
@@ -408,52 +418,3 @@ class Perp:
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
-
-
-if __name__ == '__main__':
-    symbol_xt = 'eth_usdt'
-    quantity = 1
-    host = "http://fapi.xt-qa.com"
-    access_key = ""
-    secret_key = ""
-    xt_perp = Perp(host, access_key, secret_key)
-    # 1.账户资金
-    # res = xt_perp.get_account_capital()
-    # print(res)
-    # 2.listen-key
-    # res = xt_perp.get_listen_key()
-    # print(res)
-    # 3.下单
-    # res = xt_perp.send_order(symbol=symbol_xt, amount=quantity, order_side='BUY', price=2000, order_type='LIMIT',
-    #                          position_side='LONG')
-    # print(res)
-    # 4.撤单
-    # res = xt_perp.cancel_order(order_id="319725440900455488")
-    # print(res)
-    # 5.批量下单
-    # res = xt_perp.send_batch_order(
-    #     order_list=[
-    #         {"symbol": "eth_usdt", "origQty": "1", "orderSide": "BUY", "price": "2000", "positionSide": "LONG",
-    #          "orderType": "LIMIT"}])
-    # print(res)
-    # 6.批量撤单
-    # res = xt_perp.cancel_batch_order(["319626610863430720"])
-    # print(res)
-    # 7.查询账户订单
-    # res = xt_perp.get_account_order("NEW")
-    # print(res)
-    # 8.查询订单状态 318212657052603520
-    # res = xt_perp.get_order_id("318212657052603520")
-    # print(res)
-    # 10.设置杠杆
-    # res = xt_perp.set_account_leverage(leverage=1,symbol="eth_usdt",position_side="LONG")
-    # print(res)
-    # 11.查询历史订单
-    res = xt_perp.get_history_order()
-    print(res)
-    # 12.全部撤单
-    # res = xt_perp.cancel_all_order(symbol="eth_usdt")
-    # print(res)
-    # 13.获取仓位
-    # res = xt_perp.get_position(symbol="eth_usdt")
-    # print(res)
