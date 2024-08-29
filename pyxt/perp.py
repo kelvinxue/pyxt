@@ -204,6 +204,26 @@ class Perp:
         code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
         return code, success, error
 
+    def get_symbol_list(self):
+        """
+        :return: symbol list
+        """
+        params = {}
+        url = self.host + "/future/market" + '/v3/public/symbol/list'
+        code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
+        return code, success, error
+    
+    def get_funding_rate_record(self, symbol:str, direction:str="", id:str="", limit:str=""):
+        params = {
+            "symbol": symbol,
+            "direction": direction,
+            "id": id,
+            "limit": limit
+        }
+        url = self.host + "/future/market" + '/v1/public/q/funding-rate-record'
+        code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
+        return code, success, error
+
     def get_account_capital(self):
         """
         :return: account capital
@@ -418,3 +438,4 @@ class Perp:
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
+
