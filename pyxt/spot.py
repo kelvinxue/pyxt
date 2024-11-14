@@ -399,6 +399,9 @@ class Spot:
         res = self.req_post("/v4/order", params)
         return res['result']
 
+    def batch_order(self):
+        pass
+
     def cancel_order(self, order_id):
         """
             单笔撤单

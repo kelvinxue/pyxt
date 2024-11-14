@@ -254,7 +254,15 @@ class XTWebsocketClient:
 
     def ping(self):
         logger.debug("Sending ping to XT WebSocket Server")
-        self.socket_manager.ping()
+        self.socket_manager.send_message(message="ping")
+
+    def heartbeat(self):
+        while True:
+            if self.socket_manager.is_alive():
+                self.ping()
+                time.sleep(15)
+            else:
+                break
 
     def stop(self, id=None):
         self.socket_manager.close()

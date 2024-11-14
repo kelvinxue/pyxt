@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import time
+import threading
 from pyxt.websocket.perp import PerpWebsocketStreamClient
-
 
 if __name__ == '__main__':
     symbol = "btc_usdt"
@@ -15,6 +15,8 @@ if __name__ == '__main__':
 
     # Subscribe to a single symbol stream
     my_client.depth(symbol=symbol, level=50, action=PerpWebsocketStreamClient.ACTION_SUBSCRIBE)
+    # keep heartbeat
+    threading.Thread(target=my_client.heartbeat, daemon=False).start()
     time.sleep(5)
     # # Unsubscribe
     my_client.depth(symbol=symbol, level=50, action=PerpWebsocketStreamClient.ACTION_UNSUBSCRIBE)

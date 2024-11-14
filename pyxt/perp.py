@@ -212,8 +212,8 @@ class Perp:
         url = self.host + "/future/market" + '/v3/public/symbol/list'
         code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
         return code, success, error
-    
-    def get_funding_rate_record(self, symbol:str, direction:str="", id:str="", limit:str=""):
+
+    def get_funding_rate_record(self, symbol: str, direction: str = "", id: str = "", limit: str = ""):
         """
         get funding rate record
         :param symbol: str, symbol, required
@@ -231,7 +231,7 @@ class Perp:
         url = self.host + "/future/market" + '/v1/public/q/funding-rate-record'
         code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
         return code, success, error
-    
+
     def get_leverage_bracket_list(self):
         """
         :return: list of leverage brackets
@@ -240,8 +240,8 @@ class Perp:
         url = self.host + "/future/market" + '/v1/public/leverage/bracket/list'
         code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
         return code, success, error
-    
-    def get_leverage_bracket_detail(self, symbol:str):
+
+    def get_leverage_bracket_detail(self, symbol: str):
         """
         :param symbol: symbol
         :return: leverage bracket detail
@@ -262,13 +262,13 @@ class Perp:
         url = self.host + "/future/market" + '/v1/public/q/tickers'
         code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
         return code, success, error
-    
-    def get_ticker(self,symbol:str):
+
+    def get_ticker(self, symbol: str):
         """
         Get all tickers
         :return: code, success, error
         """
-        params = {'symbol':symbol}
+        params = {'symbol': symbol}
         url = self.host + "/future/market" + '/v1/public/q/ticker'
         code, success, error = self._fetch(method="GET", url=url, params=params, timeout=self.timeout)
         return code, success, error
@@ -487,4 +487,3 @@ class Perp:
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
-

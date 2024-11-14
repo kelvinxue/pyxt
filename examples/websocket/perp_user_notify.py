@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import time
+import threading
 from pyxt.websocket.perp import PerpWebsocketStreamClient
 
 if __name__ == '__main__':
@@ -16,6 +17,8 @@ if __name__ == '__main__':
 
     # Subscribe to a single symbol stream
     my_client.user_notify(listen_key=listen_key, action=PerpWebsocketStreamClient.ACTION_SUBSCRIBE)
+    # keep heartbeat
+    threading.Thread(target=my_client.heartbeat, daemon=False).start()
     time.sleep(5)
     # # Unsubscribe
     my_client.user_notify(listen_key=listen_key, action=PerpWebsocketStreamClient.ACTION_UNSUBSCRIBE)
