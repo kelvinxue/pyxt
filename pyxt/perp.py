@@ -487,3 +487,283 @@ class Perp:
                                    params=params)
         code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
         return code, success, error
+
+    def send_trigger_order(self, symbol, order_side, entrust_type, orig_qty, time_in_force, trigger_price_type,
+                           position_side, stop_price, price=None, client_order_id=None):
+        """
+        @param symbol:
+        @param order_side:
+        @param entrust_type:
+        @param qty:
+        @param time_in_force:
+        @param trigger_price_type:
+        @param position_side:
+        @param price:
+        @param client_order_id:
+        @param stop_price:
+        @return:
+        """
+        params = {
+            "orderSide": order_side,
+            "entrustType": entrust_type,
+            "origQty": orig_qty,
+            "timeInForce": time_in_force,
+            "triggerPriceType": trigger_price_type,
+            "positionSide": position_side,
+            "symbol": symbol,
+            "stop_price": stop_price
+        }
+        if price:
+            params["price"] = price
+        if client_order_id:
+            params["clientOrderId"] = client_order_id
+        if time_in_force:
+            params["timeInForce"] = time_in_force
+        if stop_price:
+            params["stopPrice"] = stop_price
+
+        bodymod = "application/json"
+        path = "/future/trade" + '/v1/entrust/create-plan'
+        url = self.host + path
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
+
+    def cancel_trigger_order(self, entrust_id):
+        """
+        @param entrust_id:
+        @return:
+        """
+        params = {
+            "entrustId": entrust_id,
+        }
+        bodymod = "application/json"
+        path = "/future/trade" + '/v1/entrust/cancel-plan'
+        url = self.host + path
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
+
+    def cancel_all_trigger_order(self, symbol):
+        """
+        @param symbol:
+        @return:
+        """
+        params = {
+            "symbol": symbol,
+        }
+        bodymod = "application/json"
+        path = "/future/trade" + '/v1/entrust/cancel-all-plan'
+        url = self.host + path
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
+
+    def get_trigger_order(self, symbol, state, page=None, size=None, start_time=None, end_time=None):
+        """
+        @param symbol:
+        @param state:
+        @param page:
+        @param size:
+        @param start_time:
+        @param end_time:
+        @return:
+        """
+        bodymod = "application/x-www-form-urlencoded"
+        path = "/future/user" + '/v1/entrust/plan-list'
+        url = self.host + path
+        params = {
+            "symbol": symbol,
+            "state": state,
+        }
+        if page:
+            params["page"] = page
+        if size:
+            params["size"] = size
+        if start_time:
+            params["startTime"] = start_time
+        if end_time:
+            params["endTime"] = end_time
+
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        header["Content-Type"] = "application/x-www-form-urlencoded"
+        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        return code, success, error
+
+    def get_trigger_order_by_id(self, entrust_id):
+        """
+        @param entrust_id:
+        @return:
+        """
+        bodymod = "application/x-www-form-urlencoded"
+        path = "/future/user" + '/v1/entrust/plan-detail'
+        url = self.host + path
+        params = {
+            "entrustId": entrust_id,
+        }
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        header["Content-Type"] = "application/x-www-form-urlencoded"
+        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        return code, success, error
+
+    def get_trigger_order_history(self, symbol, direction=None, id=None, limit=None, start_time=None, end_time=None):
+        """
+        @param entrust_id:
+        @return:
+        """
+        bodymod = "application/x-www-form-urlencoded"
+        path = "/future/user" + '/v1/entrust/plan-list-history'
+        url = self.host + path
+        params = {
+            "symbol": symbol
+        }
+        if direction:
+            params["direction"] = direction
+        if id:
+            params["id"] = id
+        if limit:
+            params["limit"] = limit
+        if start_time:
+            params["startTime"] = start_time
+        if end_time:
+            params["endTime"] = end_time
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        header["Content-Type"] = "application/x-www-form-urlencoded"
+        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        return code, success, error
+
+    def send_stop_profit_or_loss_order(self, symbol, orig_qty, trigger_profit_price, trigger_stop_price, expire_time,
+                                       position_side):
+        """
+        @param symbol:
+        @param orig_qty:
+        @param trigger_profit_price:
+        @param trigger_stop_price:
+        @param expire_time:
+        @param position_side:
+        @return:
+        """
+        params = {
+            "symbol": symbol,
+            "origQty": orig_qty,
+            "triggerProfitPrice": trigger_profit_price,
+            "triggerStopPrice": trigger_stop_price,
+            "expireTime": expire_time,
+            "positionSide": position_side,
+        }
+        bodymod = "application/json"
+        path = "/future/trade" + '/v1/entrust/create-profit'
+        url = self.host + path
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
+
+    def cancel_stop_profit_or_loss_order(self, profit_id):
+        """
+        @param profit_id:
+        @return:
+        """
+        params = {
+            "profitId": profit_id
+        }
+        bodymod = "application/json"
+        path = "/future/trade" + '/v1/entrust/cancel-profit-stop'
+        url = self.host + path
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
+
+    def cancel_all_stop_profit_or_loss_order(self, symbol):
+        """
+        @param symbol:
+        @return:
+        """
+        params = {
+            "symbol": symbol
+        }
+        bodymod = "application/json"
+        path = "/future/trade" + '/v1/entrust/cancel-all-profit-stop'
+        url = self.host + path
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
+
+    def get_stop_profit_or_loss_order(self, symbol, state, page=None, size=None, start_time=None, end_time=None):
+        """
+        @param symbol:
+        @param state:
+        @param page:
+        @param size:
+        @param start_time:
+        @param end_time:
+        @return:
+        """
+        bodymod = "application/x-www-form-urlencoded"
+        path = "/future/user" + '/v1/entrust/profit-list'
+        url = self.host + path
+        params = {
+            "symbol": symbol,
+            "state": state,
+        }
+        if page:
+            params["page"] = page
+        if size:
+            params["size"] = size
+        if start_time:
+            params["startTime"] = start_time
+        if end_time:
+            params["endTime"] = end_time
+
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        header["Content-Type"] = "application/x-www-form-urlencoded"
+        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        return code, success, error
+
+    def get_stop_profit_or_loss_order_by_id(self, profit_id):
+        """
+        @param profit_id:
+        @return:
+        """
+        bodymod = "application/x-www-form-urlencoded"
+        path = "/future/user" + '/v1/entrust/profit-detail'
+        url = self.host + path
+        params = {
+            "profitId": profit_id,
+        }
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        header["Content-Type"] = "application/x-www-form-urlencoded"
+        code, success, error = self._fetch(method="GET", url=url, headers=header, params=params, timeout=self.timeout)
+        return code, success, error
+
+    def modify_stop_profit_or_loss_order(self, profit_id, trigger_profit_price=None, trigger_stop_price=None):
+        """
+        @param profit_id:
+        @param trigger_profit_price:
+        @param trigger_stop_price:
+        @return:
+        """
+        params = {
+            "profitId": profit_id
+        }
+        if trigger_profit_price:
+            params["triggerProfitPrice"] = trigger_profit_price
+        if trigger_stop_price:
+            params["triggerStopPrice"] = trigger_stop_price
+        bodymod = "application/json"
+        path = "/future/trade" + '/v1/entrust/update-profit-stop'
+        url = self.host + path
+        header = self._create_sign(self.__access_key, self.__secret_key, path=path, bodymod=bodymod,
+                                   params=params)
+        code, success, error = self._fetch(method="POST", url=url, headers=header, data=params, timeout=self.timeout)
+        return code, success, error
